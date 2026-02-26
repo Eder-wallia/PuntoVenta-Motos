@@ -368,10 +368,12 @@
   }
 
   .btn-back {
-    padding: 2px 8px;
+    padding: 3px 9px;
 
     font-size: 9px;
-    border-radius: 4px;
+    border-radius: 6px;
+     align-self: center;  /* que no se estire verticalmente */
+  width: fit-content;  /* que no ocupe todo el ancho */
   }
 
   .history-main {
