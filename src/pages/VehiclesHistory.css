@@ -368,9 +368,9 @@
   }
 
   .btn-back {
-    padding: 3px 9px;
+    padding: 8px 14px;
 
-    font-size: 9px;
+    font-size: 14px;
     border-radius: 6px;
      align-self: center;  /* que no se estire verticalmente */
   width: fit-content;  /* que no ocupe todo el ancho */
