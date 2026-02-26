@@ -368,9 +368,10 @@
   }
 
   .btn-back {
-    padding: 3px 5px;
-  
-    font-size: 11px;
+    padding: 2px 8px;
+
+    font-size: 9px;
+    border-radius: 4px;
   }
 
   .history-main {
