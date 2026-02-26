@@ -1,14 +1,15 @@
 :root {
   /* Colores */
   --color-background: #F4F7F6;
-  --color-primary: #2C3E50;
-  --color-accent: #00BFA5;
+  --color-primary: #1E1E1E;
+  --color-accent: #E21B23;
   --color-accent-alt: #FFD700;
-  --color-text: #212121;
+  --color-text: #FFFFFF;
+  --color-text-secondary: #B3B3B3;
   --color-white: #FFFFFF;
-  --color-border: #E0E8E8;
-  --color-error: #E74C3C;
-  --color-success: #27AE60;
+  --color-border: #2D2D2D;
+  --color-error: #FF3333;
+  --color-success: #2ECC71;
   
   /* Tipografía */
   font-family: system-ui, -apple-system, sans-serif;
