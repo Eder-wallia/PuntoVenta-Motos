@@ -7,6 +7,7 @@ export function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [verPass, setVerPass] = useState(false);
   const [currentError, setCurrentError] = useState('');
 
   // Obtener estado del store
@@ -69,19 +70,25 @@ export function Login() {
               disabled={isLoading}
             />
           </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={isLoading}
-            />
-          </div>
+<div className="form-group" style={{position:'relative'}}>
+  <label htmlFor="password">Contraseña</label>
+  <input
+    id="password"
+    type={verPass ? 'text' : 'password'}
+    placeholder="••••••••"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    required
+    disabled={isLoading}
+  />
+  <button
+    type="button"
+    onClick={() => setVerPass(!verPass)}
+    style={{position:'absolute', right:'12px', top:'65%', background:'none', border:'none', cursor:'pointer', fontSize:'16px'}}
+  >
+    {verPass ? '🙈' : '👁️'}
+  </button>
+</div>
 
           <button
             type="submit"
