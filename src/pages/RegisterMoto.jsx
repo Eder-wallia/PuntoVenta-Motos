@@ -1,6 +1,6 @@
-import { MOTORCYCLE_BRANDS, CAR_BRANDS } from '../constants/vehicleBrands';
-import { useRegisterMoto } from '../hooks/useRegisterMoto';
-import './RegisterMoto.css';
+import { MOTORCYCLE_BRANDS, CAR_BRANDS } from "../constants/vehicleBrands";
+import { useRegisterMoto } from "../hooks/useRegisterMoto";
+import "./RegisterMoto.css";
 
 export function RegisterMoto() {
   const {
@@ -30,23 +30,23 @@ export function RegisterMoto() {
           {/* Sección: Tipo de Vehículo */}
           <fieldset className="form-section">
             <legend>Tipo de Vehículo</legend>
-            
+
             <div className="vehicle-type-container">
               <label className="checkbox-label">
                 <input
                   type="checkbox"
-                  checked={vehicleType === 'motorcycle'}
-                  onChange={() => handleVehicleTypeChange('motorcycle')}
+                  checked={vehicleType === "motorcycle"}
+                  onChange={() => handleVehicleTypeChange("motorcycle")}
                   disabled={loading}
                 />
                 <span className="checkbox-text">🏍️ Moto</span>
               </label>
-              
+
               <label className="checkbox-label">
                 <input
                   type="checkbox"
-                  checked={vehicleType === 'car'}
-                  onChange={() => handleVehicleTypeChange('car')}
+                  checked={vehicleType === "car"}
+                  onChange={() => handleVehicleTypeChange("car")}
                   disabled={loading}
                 />
                 <span className="checkbox-text">🚗 Carro</span>
@@ -57,7 +57,7 @@ export function RegisterMoto() {
           {/* Sección: Datos Cliente */}
           <fieldset className="form-section">
             <legend>Datos Cliente</legend>
-            
+
             <div className="form-group">
               <label htmlFor="clientName">Nombre cliente *</label>
               <input
@@ -118,7 +118,7 @@ export function RegisterMoto() {
             <fieldset className="form-section">
               <legend>Datos Vehiculo</legend>
 
-              {vehicleType === 'motorcycle' && (
+              {vehicleType === "motorcycle" && (
                 <div className="form-group">
                   <label htmlFor="motorcycleBrand">Marca (Moto) *</label>
                   <select
@@ -138,7 +138,7 @@ export function RegisterMoto() {
                 </div>
               )}
 
-              {vehicleType === 'car' && (
+              {vehicleType === "car" && (
                 <div className="form-group">
                   <label htmlFor="carBrand">Marca (Carro) *</label>
                   <select
@@ -211,6 +211,18 @@ export function RegisterMoto() {
                     disabled={loading}
                   />
                 </div>
+                <div className="form-group">
+                  <label htmlFor="clientAddress">Observaciones *</label>
+                  <input
+                    type="text"
+                    id="observations"
+                    name="observations"
+                    value={formData.observations}
+                    onChange={handleChange}
+                    placeholder="Ej: Golpe lado del conductor"
+                    disabled={loading}
+                  />
+                </div>
               </div>
             </fieldset>
           )}
@@ -230,7 +242,7 @@ export function RegisterMoto() {
               className="btn btn-primary"
               disabled={loading}
             >
-              {loading ? 'Registrando...' : 'Registrar Vehiculo'}
+              {loading ? "Registrando..." : "Registrar Vehiculo"}
             </button>
           </div>
         </form>
