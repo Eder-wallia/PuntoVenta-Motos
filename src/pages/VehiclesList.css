@@ -373,12 +373,13 @@
 
 /* Extra small devices (390px width) */
 @media (max-width: 480px) {
-  .vehicles-header {
+   .vehicles-header {
     padding: 12px;
     gap: 8px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: auto;
+    align-items: center;
     justify-items: center;
   }
 
@@ -396,7 +397,7 @@
     padding: 6px 10px;
     font-size: 11px;
     grid-column: 1;
-    grid-row: 2;
+    grid-row: 1;
   }
 
   .btn-register-new {

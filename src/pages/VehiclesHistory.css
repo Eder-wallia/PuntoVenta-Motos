@@ -381,9 +381,9 @@
     padding: 6px 12px;
     font-size: 14px;
     border-radius: 6px;
-    align-self: center; /* que no se estire verticalmente */
+    align-self: flex-start; /* que no se estire verticalmente */
     width: fit-content; /* que no ocupe todo el ancho */
-    margin-right: 100px;
+    
   }
 
   .history-main {
