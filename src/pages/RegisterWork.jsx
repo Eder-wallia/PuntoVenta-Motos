@@ -57,7 +57,7 @@ export function RegisterWork() {
               onClick={() => navigate('/vehicles')}
               aria-label="Volver atrás"
             >
-              ← Volver
+              ←
             </button>
             <h1>🔧 Registrar Trabajo</h1>
           </div>

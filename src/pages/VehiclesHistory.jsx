@@ -72,7 +72,7 @@ Notas: ${work.notes}
           onClick={() => navigate('/vehicles')}
           aria-label="Volver a vehículos"
         >
-          ← Volver
+          ←
         </button>
         <h1>📋 Historial de Trabajos</h1>
       </header>
