@@ -40,7 +40,7 @@ export function VehiclesList() {
           onClick={() => navigate('/dashboard')}
           aria-label="Volver al dashboard"
         >
-          ← Volver
+          ← 
         </button>
         <h1>🚗 Vehículos Registrados</h1>
         <button className="btn btn-register-new" onClick={handleRegisterVehicle}>
