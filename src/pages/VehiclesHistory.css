@@ -368,8 +368,7 @@
   }
 
   .btn-back {
-    padding: 8px 14px;
-
+    padding: 6px 70px;
     font-size: 14px;
     border-radius: 6px;
      align-self: center;  /* que no se estire verticalmente */
