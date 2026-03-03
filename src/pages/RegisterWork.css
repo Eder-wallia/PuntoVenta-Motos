@@ -6,7 +6,9 @@
   justify-content: center;
   background-color: var(--color-background);
   padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
 }
 
 .work-card {
@@ -45,7 +47,7 @@
   margin-bottom: 20px;
 }
 
-.btn-back {
+.btn-back-register {
   background-color: var(--color-primary);
   color: white;
   border: none;
@@ -59,12 +61,12 @@
   white-space: nowrap;
 }
 
-.btn-back:hover {
+.btn-back-register:hover {
   background-color: #1a2f47;
   transform: translateX(-4px);
 }
 
-.btn-back:active {
+.btn-back-register:active {
   transform: translateX(0);
 }
 
@@ -228,7 +230,11 @@
 }
 
 .btn-add {
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    var(--color-primary) 100%
+  );
   color: white;
   padding: 12px 20px;
   border: none;
@@ -292,7 +298,7 @@
 }
 
 .btn-remove {
-  background: #E74C3C;
+  background: #e74c3c;
   color: white;
   border: none;
   border-radius: 4px;
@@ -317,7 +323,11 @@
 
 /* Summary Section */
 .summary-section {
-  background: linear-gradient(135deg, rgba(0, 191, 165, 0.05), rgba(44, 62, 80, 0.05));
+  background: linear-gradient(
+    135deg,
+    rgba(0, 191, 165, 0.05),
+    rgba(44, 62, 80, 0.05)
+  );
 }
 
 .summary-grid {
@@ -407,9 +417,9 @@
 .alert-success {
   background-color: #efe;
   color: #2a6b2a;
-  border-left-color: #27AE60;
+  border-left-color: #27ae60;
   border: 1px solid #cfc;
-  border-left: 4px solid #27AE60;
+  border-left: 4px solid #27ae60;
 }
 
 .error-message {
@@ -442,7 +452,11 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-primary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    var(--color-primary) 100%
+  );
   color: white;
   flex: 1;
 }
@@ -487,7 +501,7 @@
     margin-bottom: 16px;
   }
 
-  .btn-back {
+  .btn-back-register {
     padding: 8px 12px;
     font-size: 12px;
   }
@@ -592,15 +606,17 @@
   }
 
   .summary-header {
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
+    align-items: center;
   }
 
-  .btn-back {
-    padding: 6px 30px;
+  .btn-back-register {
+    padding: 6px 12px;
     font-size: 11px;
-    width: 100%;
-    text-align: center;
+    width: auto;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .vehicle-summary h1 {

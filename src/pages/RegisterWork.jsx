@@ -53,7 +53,7 @@ export function RegisterWork() {
         <div className="vehicle-summary">
           <div className="summary-header">
             <button 
-              className="btn-back"
+              className="btn-back-register"
               onClick={() => navigate('/vehicles')}
               aria-label="Volver atrás"
             >
