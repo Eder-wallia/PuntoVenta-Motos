@@ -394,6 +394,8 @@
   }
 
   .btn-back {
+    margin-left: 10px;
+    border: 2px solid rgb(245, 197, 197) !important;
     padding: 6px 10px;
     font-size: 11px;
     grid-column: 1;
