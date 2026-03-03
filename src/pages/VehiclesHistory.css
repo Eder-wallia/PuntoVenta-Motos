@@ -33,7 +33,7 @@
 }
 
 .btn-back {
-  background-color: var(--color-primary);
+  background-color: transparent;
   color: white;
   border: none;
   padding: 10px 16px;
