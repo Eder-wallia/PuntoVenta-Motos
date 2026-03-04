@@ -48,7 +48,7 @@
 }
 
 .btn-back:hover {
-  background-color: #1a2f47;
+  background-color: #c5aab0 !important;
   transform: translateX(-4px);
 }
 

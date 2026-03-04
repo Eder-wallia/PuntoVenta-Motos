@@ -31,7 +31,7 @@
 .btn-back {
   background-color: var(--color-primary);
   color: white;
-  border: 2px solid rgb(245, 197, 197) !important;
+  border: 2px solid rgb(252, 238, 238) !important;
   padding: 2px 30px 6px !important;
   border-radius: 6px;
   font-size: 30px !important;
@@ -48,8 +48,9 @@
 }
 
 .btn-back:hover {
-  background-color: #1a2f47;
+  background-color: #afafaf !important;
   transform: translateX(-4px);
+  
 }
 
 .btn-back:active {
@@ -57,12 +58,13 @@
 }
 
 .btn-register-new {
-  background-color: var(--color-primary);
+  margin-left: 8px;
+  background-color: transparent;
   color: white;
-  border: none;
+  border: 2px solid rgb(252, 238, 238) !important;
   padding: 10px 16px;
   border-radius: 8px;
-  font-size: 13px;
+  font-size: 12px !important;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -72,7 +74,7 @@
 }
 
 .btn-register-new:hover {
-  background-color: #1a2f47;
+  background-color: #c5aab0 !important;
   transform: translateY(-2px);
   box-shadow: 0 5px 15px rgba(44, 62, 80, 0.4);
 }
@@ -414,6 +416,7 @@
   .btn-register-new {
     padding: 6px 10px;
     font-size: 11px;
+    border: 1px solid rgb(252, 238, 238) !important;
     grid-column: 1 / 4;
     grid-row: 2;
     width: 190px !important;
