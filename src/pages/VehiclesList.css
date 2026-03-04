@@ -32,9 +32,9 @@
   background-color: var(--color-primary);
   color: white;
   border: 2px solid rgb(245, 197, 197) !important;
-  padding: 5px 30px 10px !important;
+  padding: 2px 30px 6px !important;
   border-radius: 6px;
-  font-size: 35px !important;
+  font-size: 30px !important;
   display: flex;
   align-items: center;
   justify-content: center;
