@@ -89,6 +89,7 @@
 }
 
 .form-group input,
+.form-group textarea,
 .form-group select {
   padding: 12px 16px;
   border: 2px solid var(--color-border);
@@ -98,6 +99,7 @@
   font-family: inherit;
   background-color: white;
   color: var(--color-text);
+  width: 100%;  /* 👈 agrega esta línea */
 }
 
 .form-group input:focus,

@@ -211,7 +211,7 @@ export function RegisterMoto() {
                     disabled={loading}
                   />
                 </div>
-                <div className="form-group">
+                <div className="form-group" style={{ gridColumn: '1 / -1' }}>
                   <label htmlFor="clientAddress">Observaciones *</label>
                   <input
                     type="text"
