@@ -297,7 +297,7 @@
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(0, 191, 165, 0.3);
+  box-shadow: 0 10px 20px rgba(191, 0, 0, 0.3);
 }
 
 .btn-download {

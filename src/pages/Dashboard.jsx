@@ -22,9 +22,9 @@ export function Dashboard() {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>🏍️ Sistema de Gestión de Vehiculos</h1>
+          <h1>Sistema de Gestión de Vehiculos</h1>
           <div className="user-info">
-            <span>Bienvenido, <strong>{user?.name || user?.email}</strong></span>
+            <span>Bienvenido, <strong>{user?.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1) : user?.email}</strong></span>
             <button onClick={handleLogout} className="btn btn-logout">
               Salir
             </button>
@@ -36,27 +36,31 @@ export function Dashboard() {
         <section className="dashboard-section">
           <h2>Módulos disponibles</h2>
           <div className="modules-grid">
-            <div className="module-card">
-              <h3>📝 Registrar Vehiculo</h3>
-              <p>Crear un nuevo registro de vehiculo en el sistema</p>
-              <button 
-                className="btn btn-secondary"
-                onClick={() => handleNavigate('/register-moto')}
-              >
-                Ir
-              </button>
-            </div>
+            {user?.role === 'administrador' && (
+              <div className="module-card">
+                <h3>📝 Registrar Vehiculo</h3>
+                <p>Crear un nuevo registro de vehiculo en el sistema</p>
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => handleNavigate('/register-moto')}
+                >
+                  Ir
+                </button>
+              </div>
+            )}
 
-            <div className="module-card">
-              <h3>🔧 Registrar Trabajo</h3>
-              <p>Registrar trabajos realizados a los vehiculos</p>
-              <button 
-                className="btn btn-secondary"
-                onClick={() => handleNavigate('/vehicles')}
-              >
-                Ir
-              </button>
-            </div>
+            {(user?.role === 'administrador' || user?.role === 'mecanico') && (
+              <div className="module-card">
+                <h3>🔧 Registrar Trabajo</h3>
+                <p>Registrar trabajos realizados a los vehiculos</p>
+                <button 
+                  className="btn btn-secondary"
+                  onClick={() => handleNavigate('/vehicles')}
+                >
+                  Ir
+                </button>
+              </div>
+            )}
 
             {/* <div className="module-card">
               <h3>📊 Ver Vehiculos</h3>

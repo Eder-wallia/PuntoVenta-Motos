@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { useLogin } from '../hooks/useLogin';
 import './Login.css';
 
 export function Login() {
@@ -10,10 +11,11 @@ export function Login() {
   const [verPass, setVerPass] = useState(false);
   const [currentError, setCurrentError] = useState('');
 
-  // Obtener estado del store
+  // Hook de login con axios
+  const { login: loginWithAxios, isLoading } = useLogin();
+
+  // Obtener token del store para verificar autenticación
   const token = useAuthStore((state) => state.token);
-  const isLoading = useAuthStore((state) => state.isLoading);
-  const login = useAuthStore((state) => state.login);
 
   // Si ya está autenticado, redirigir al dashboard
   useEffect(() => {
@@ -23,29 +25,35 @@ export function Login() {
   }, [token, navigate]);
 
   // Obtener usuarios de prueba (para mostrar en la UI)
-  const mockUsers = [
-    { email: 'admin@ejemplo.com', password: 'admin123', name: 'Administrador' },
-    { email: 'usuario@ejemplo.com', password: 'usuario123', name: 'Usuario Prueba' },
-    { email: 'mecanico@ejemplo.com', password: 'mecanico123', name: 'Mecánico' },
-    { email: 'vendedor@ejemplo.com', password: 'vendedor123', name: 'Vendedor' },
-  ];
+  // const mockUsers = [
+  //   { email: 'admin@ejemplo.com', password: 'admin123', name: 'Administrador' },
+  //   { email: 'usuario@ejemplo.com', password: 'usuario123', name: 'Usuario Prueba' },
+  //   { email: 'mecanico@ejemplo.com', password: 'mecanico123', name: 'Mecánico' },
+  //   { email: 'vendedor@ejemplo.com', password: 'vendedor123', name: 'Vendedor' },
+  // ];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setCurrentError('');
 
     try {
-      await login(email, password);
+      const result = await loginWithAxios(email, password);
+      if (result.success) {
+        // El token se guardará en el store automáticamente por el hook
+        // La redirección ocurrirá en el useEffect abajo
+      } else {
+        setCurrentError(result.error || 'Error en la autenticación');
+      }
     } catch (err) {
-      setCurrentError(err.toString());
+      setCurrentError(err.message || 'Error desconocido');
     }
   };
 
-  const handleQuickLogin = (userEmail) => {
-    setEmail(userEmail);
-    setPassword('');
-    setCurrentError('');
-  };
+  // const handleQuickLogin = (userEmail) => {
+  //   setEmail(userEmail);
+  //   setPassword('');
+  //   setCurrentError('');
+  // };
 
   return (
     <div className="login-container">
@@ -111,7 +119,7 @@ export function Login() {
         </form>
 
         {/* Usuarios de prueba */}
-        <div className="test-users">
+        {/* <div className="test-users">
           <p className="test-users-title">👤 Usuarios de prueba:</p>
           <div className="users-list">
             {mockUsers.map((user) => (
@@ -129,7 +137,7 @@ export function Login() {
             ))}
           </div>
           <p className="test-hint">💡 Haz clic en un usuario para rellenar el email, luego ingresa la contraseña</p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
