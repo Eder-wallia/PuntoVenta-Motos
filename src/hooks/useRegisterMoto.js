@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useRegisterClient } from './useRegisterClient';
+import { useRegisterVehicle } from './useRegisterVehicle';
 
 export function useRegisterMoto() {
   const navigate = useNavigate();
+  const { registerClient } = useRegisterClient();
+  const { registerVehicle } = useRegisterVehicle();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -22,6 +26,7 @@ export function useRegisterMoto() {
     color: '',
     plates: '',
     mileage: '',
+    observations: '',
   });
 
   const handleVehicleTypeChange = (type) => {
@@ -106,6 +111,10 @@ export function useRegisterMoto() {
       setError('El kilometraje es requerido');
       return false;
     }
+    if (!formData.observations.trim()) {
+      setError('Las observaciones son requeridas');
+      return false;
+    }
     return true;
   };
 
@@ -119,16 +128,67 @@ export function useRegisterMoto() {
     setLoading(true);
     
     try {
-      const dataToSubmit = {
-        ...formData,
-        vehicleType: vehicleType,
+      // Paso 1: Registrar cliente
+      const clientResult = await registerClient({
+        nombre: formData.clientName,
+        email: formData.clientEmail,
+        telefono: formData.clientPhone,
+        domicilio: formData.clientAddress,
+      });
+
+      if (!clientResult.success) {
+        setError(clientResult.error || 'Error al registrar el cliente');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Respuesta completa del cliente:', clientResult.data);
+
+      // El servidor puede devolver el clienteId en diferentes lugares
+      const responseData = clientResult.data;
+      let clienteId = responseData.clienteId || 
+                      responseData.cliente?.clienteId ||
+                      responseData.data?.clienteId;
+      
+      console.log('Tipo de clienteId:', typeof clienteId);
+      console.log('ClienteId extraído:', clienteId);
+      console.log('Es truthy?', !!clienteId);
+
+      // Esperar un poco para asegurar que MongoDB insertó correctamente
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      if (!clienteId) {
+        console.error('No se pudo extraer el clienteId. Respuesta del servidor:', responseData);
+        setError('Error: No se obtuvo el ID del cliente. Verifique la respuesta del servidor.');
+        setLoading(false);
+        return;
+      }
+
+      // Paso 2: Registrar vehículo (con la información del cliente)
+      const vehiclePayload = {
+        clienteId: clienteId,
+        tipo: vehicleType === 'motorcycle' ? 'moto' : 'carro',
+        marca: vehicleType === 'motorcycle' ? formData.motorcycleBrand : formData.carBrand,
+        modelo: formData.model,
+        color: formData.color,
+        placas: formData.plates,
+        kilometraje: formData.mileage,
+        observaciones: formData.observations,
       };
-      console.log('Datos del registro:', dataToSubmit);
       
-      // Simular delay de red
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      console.log('Datos a enviar en vehículo:', vehiclePayload);
       
-      setSuccess('¡Vehículo registrado correctamente!');
+      const vehicleResult = await registerVehicle(vehiclePayload);
+
+      if (!vehicleResult.success) {
+        setError(vehicleResult.error || 'Error al registrar el vehículo');
+        setLoading(false);
+        return;
+      }
+
+      console.log('Vehículo registrado exitosamente:', vehicleResult.data);
+      
+      setSuccess('¡Vehículo y cliente registrados correctamente!');
       setFormData({
         clientName: '',
         clientPhone: '',
@@ -140,6 +200,7 @@ export function useRegisterMoto() {
         color: '',
         plates: '',
         mileage: '',
+        observations: '',
       });
       setVehicleType('');
       

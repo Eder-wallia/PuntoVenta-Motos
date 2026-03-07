@@ -23,8 +23,49 @@ export function RegisterMoto() {
           <p>Complete el formulario con los datos del cliente y del vehículo</p>
         </div>
 
-        {error && <div className="alert alert-error">{error}</div>}
-        {success && <div className="alert alert-success">{success}</div>}
+        {error && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h2>❌ Error</h2>
+              </div>
+              <div className="modal-body">
+                <p>{error}</p>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => window.location.reload()}
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {success && (
+          <div className="modal-overlay">
+            <div className="modal-content modal-success">
+              <div className="modal-header">
+                <h2>✅ Éxito</h2>
+              </div>
+              <div className="modal-body">
+                <p>{success}</p>
+              </div>
+              <div className="modal-footer">
+                <button 
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={true}
+                >
+                  Redirigiendo...
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="register-form">
           {/* Sección: Tipo de Vehículo */}

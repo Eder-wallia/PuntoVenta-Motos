@@ -1,12 +1,17 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRegisterWork } from '../hooks/useRegisterWork';
-import { getVehicleDisplayName, getVehicleType } from '../constants/sampleVehicles';
+import { useRegisterVehicle } from '../hooks/useRegisterVehicle';
 import './RegisterWork.css';
 
 export function RegisterWork() {
-  const location = useLocation();
   const navigate = useNavigate();
-  const vehicle = location.state?.vehicle;
+  const [vehicles, setVehicles] = useState([]);
+  const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [loadingVehicles, setLoadingVehicles] = useState(true);
+  const [vehicleError, setVehicleError] = useState(null);
+
+  const { getAllVehicles } = useRegisterVehicle();
 
   // Llamar hook antes de cualquier condicional
   const {
@@ -33,18 +38,93 @@ export function RegisterWork() {
     setObservations,
     handleSubmit,
     handleCancel,
-  } = useRegisterWork(vehicle || {});
+  } = useRegisterWork(selectedVehicle || {});
 
-  // Validation después del hook
-  if (!vehicle) {
+  // Cargar vehículos al montar el componente
+  useEffect(() => {
+    const loadVehicles = async () => {
+      setLoadingVehicles(true);
+      const result = await getAllVehicles();
+      if (result.success) {
+        setVehicles(result.data);
+      } else {
+        setVehicleError(result.error);
+      }
+      setLoadingVehicles(false);
+    };
+    loadVehicles();
+  }, []);
+
+  const handleSelectVehicle = (vehicleId) => {
+    const vehicle = vehicles.find(v => v._id === vehicleId);
+    setSelectedVehicle(vehicle);
+  };
+
+  // Mostrar selector de vehículos si no hay uno seleccionado
+  if (!selectedVehicle) {
     return (
       <div className="work-container">
-        <div className="error-message">
-          <p>Vehículo no encontrado</p>
+        <div className="work-card">
+          <div className="vehicle-summary">
+            <h1>🔧 Registrar Trabajo</h1>
+            <p>Selecciona un vehículo para registrar el trabajo</p>
+          </div>
+
+          {vehicleError && <div className="alert alert-error">{vehicleError}</div>}
+
+          {loadingVehicles ? (
+            <div className="loading-message">
+              <p>Cargando vehículos...</p>
+            </div>
+          ) : vehicles.length === 0 ? (
+            <div className="error-message">
+              <p>No hay vehículos registrados</p>
+              <button 
+                className="btn btn-primary"
+                onClick={() => navigate('/register-moto')}
+              >
+                Registrar un vehículo
+              </button>
+            </div>
+          ) : (
+            <div className="vehicle-selection">
+              <fieldset className="form-section">
+                <legend>Seleccionar Vehículo</legend>
+                <div className="vehicles-list">
+                  {vehicles.map((vehicle) => (
+                    <button
+                      key={vehicle._id}
+                      type="button"
+                      onClick={() => handleSelectVehicle(vehicle._id)}
+                      className="vehicle-select-btn"
+                    >
+                      <div className="vehicle-select-info">
+                        <span className="vehicle-type">{vehicle.tipo}</span>
+                        <span className="vehicle-model">{vehicle.marca} {vehicle.modelo}</span>
+                        <span className="vehicle-plates">{vehicle.placas}</span>
+                      </div>
+                      <span className="select-arrow">→</span>
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+              <div className="form-actions">
+                <button
+                  type="button"
+                  onClick={() => navigate('/dashboard')}
+                  className="btn btn-secondary"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
   }
+
+  // Mostrar formulario de trabajo con vehículo seleccionado
 
   return (
     <div className="work-container">
@@ -54,7 +134,7 @@ export function RegisterWork() {
           <div className="summary-header">
             <button 
               className="btn-back-register"
-              onClick={() => navigate('/vehicles')}
+              onClick={() => setSelectedVehicle(null)}
               aria-label="Volver atrás"
             >
               ←
@@ -62,10 +142,11 @@ export function RegisterWork() {
             <h1>🔧 Registrar Trabajo</h1>
           </div>
           <div className="vehicle-info-summary">
-            <span className="vehicle-type-badge">{getVehicleType(vehicle.vehicleType)}</span>
-            <h2>{getVehicleDisplayName(vehicle)}</h2>
-            <p><strong>Cliente:</strong> {vehicle.clientName}</p>
-            <p><strong>Contacto:</strong> {vehicle.clientPhone}</p>
+            <span className="vehicle-type-badge">{selectedVehicle.tipo.toUpperCase()}</span>
+            <h2>{selectedVehicle.marca} {selectedVehicle.modelo}</h2>
+            <p><strong>Placas:</strong> {selectedVehicle.placas}</p>
+            <p><strong>Color:</strong> {selectedVehicle.color}</p>
+            <p><strong>Kilometraje:</strong> {selectedVehicle.kilometraje} km</p>
           </div>
         </div>
 
