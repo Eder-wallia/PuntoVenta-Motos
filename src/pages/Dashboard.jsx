@@ -41,7 +41,7 @@ export function Dashboard() {
                 <h3>📝 Registrar Vehiculo</h3>
                 <p>Crear un nuevo registro de vehiculo en el sistema</p>
                 <button 
-                  className="btn btn-secondary"
+                  className="btn-secondary btn"
                   onClick={() => handleNavigate('/register-moto')}
                 >
                   Ir

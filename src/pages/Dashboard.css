@@ -117,7 +117,7 @@
   line-height: 1.5;
 }
 
-.btn-secondary {
+button.btn-secondary {
   background-color: var(--color-background);
   color: var(--color-accent);
   border: 2px solid var(--color-accent);

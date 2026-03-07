@@ -48,7 +48,9 @@
 }
 
 .btn-back:hover {
-  background-color: #c5aab0 !important;
+  background-color: transparent;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   transform: translateX(-4px);
 }
 

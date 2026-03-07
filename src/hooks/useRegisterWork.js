@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 export function useRegisterWork(vehicle) {
   const navigate = useNavigate();
+  const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.token);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -119,24 +123,47 @@ export function useRegisterWork(vehicle) {
     }
 
     setLoading(true);
+    setError('');
 
     try {
-      const totals = calculateTotals();
-      const workData = {
-        vehicleId: vehicle.id,
-        vehicle: vehicle,
-        services,
-        parts,
-        labor,
-        observations,
-        totals,
-        createdAt: new Date().toISOString(),
+      // Construir payload según el formato del API
+      const payload = {
+        clienteId: vehicle.clienteId,
+        vehiculoId: vehicle.vehiculoId,
+        servicios: services.map(s => ({
+          descripcion: s.description,
+          monto: s.amount,
+        })),
+        refacciones: parts.map(p => ({
+          nombre: p.name,
+          cantidad: p.quantity,
+          costoUnitario: p.unitCost,
+          total: p.total,
+        })),
+        manoDeObra: labor.map(l => ({
+          descripcion: l.description,
+          precio: l.price,
+        })),
+        observacionesTecnicas: observations,
+        estatus: 'presupuesto',
+        createdBy: user?._id,
       };
 
-      console.log('Datos del trabajo registrado:', workData);
+      console.log('📤 Enviando trabajo:', payload);
+      console.log('Token:', token ? 'Presente' : 'Ausente');
 
-      // Simular delay de red
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const response = await axios.post(
+        'http://localhost:3000/api/trabajos',
+        payload,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      console.log('✅ Trabajo registrado exitosamente:', response.data);
 
       setSuccess('¡Trabajo registrado correctamente!');
 
@@ -151,8 +178,12 @@ export function useRegisterWork(vehicle) {
         navigate('/vehicles');
       }, 2000);
     } catch (err) {
-      setError('Error al registrar el trabajo');
-      console.error(err);
+      console.error('❌ Error al registrar trabajo:', err);
+      console.error('Status:', err.response?.status);
+      console.error('Error Response:', err.response?.data);
+      
+      const errorMessage = err.response?.data?.message || err.message || 'Error al registrar el trabajo';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

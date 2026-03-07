@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useRegisterWork } from '../hooks/useRegisterWork';
 import { useRegisterVehicle } from '../hooks/useRegisterVehicle';
 import './RegisterWork.css';
 
 export function RegisterWork() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [vehicles, setVehicles] = useState([]);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
   const [loadingVehicles, setLoadingVehicles] = useState(true);
@@ -44,15 +45,28 @@ export function RegisterWork() {
   useEffect(() => {
     const loadVehicles = async () => {
       setLoadingVehicles(true);
-      const result = await getAllVehicles();
-      if (result.success) {
-        setVehicles(result.data);
-      } else {
-        setVehicleError(result.error);
+      try {
+        const result = await getAllVehicles();
+        if (result.success) {
+          setVehicles(result.data);
+          
+          // Si viene un vehículo en el state desde VehiclesList, usarlo directamente
+          if (location.state?.vehicle) {
+            console.log('🚗 Vehículo pre-seleccionado desde VehiclesList:', location.state.vehicle);
+            setSelectedVehicle(location.state.vehicle);
+          }
+        } else {
+          setVehicleError(result.error);
+        }
+      } catch (err) {
+        console.error('Error cargando vehículos:', err);
+        setVehicleError('Error al cargar vehículos');
+      } finally {
+        setLoadingVehicles(false);
       }
-      setLoadingVehicles(false);
     };
     loadVehicles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSelectVehicle = (vehicleId) => {
@@ -134,7 +148,7 @@ export function RegisterWork() {
           <div className="summary-header">
             <button 
               className="btn-back-register"
-              onClick={() => setSelectedVehicle(null)}
+              onClick={() => navigate('/vehicles')}
               aria-label="Volver atrás"
             >
               ←
