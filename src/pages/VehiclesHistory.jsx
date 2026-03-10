@@ -1,55 +1,81 @@
-import { useNavigate, useParams, useLocation } from 'react-router-dom';
-import { SAMPLE_VEHICLES, getVehicleDisplayName, getVehicleType } from '../constants/sampleVehicles';
-import { getVehicleWorkHistory, calculateWorkTotal } from '../constants/sampleWorkHistory';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useHistoryVehicle } from '../hooks/useHistoryVehicle';
 import './VehiclesHistory.css';
 
 export function VehiclesHistory() {
   const navigate = useNavigate();
-  const { vehicleId } = useParams();
   const location = useLocation();
+  const [trabajos, setTrabajos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { getWorkHistory } = useHistoryVehicle();
 
-  // Obtener vehículo del state de navegación o buscarlo en SAMPLE_VEHICLES
-  const vehicle = location.state?.vehicle || SAMPLE_VEHICLES.find(v => v.id === vehicleId);
+  // Obtener vehículo del state de navegación
+  const vehicle = location.state?.vehicle;
 
-  if (!vehicle) {
-    return (
-      <div className="history-container">
-        <div className="empty-state">
-          <p>Vehículo no encontrado</p>
-          <button className="btn btn-primary" onClick={() => navigate('/vehicles')}>
-            Volver a Vehículos
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Cargar historial de trabajos al montar el componente
+  useEffect(() => {
+    const loadWorkHistory = async () => {
+      if (!vehicle) {
+        setError('Vehículo no encontrado');
+        setLoading(false);
+        return;
+      }
 
-  // Obtener historial de trabajos
-  const workHistory = getVehicleWorkHistory(vehicleId);
+      setLoading(true);
+      setError(null);
+      console.log('🔄 Cargando historial de trabajos para vehiculoId:', vehicle.vehiculoId);
+      
+      const result = await getWorkHistory(vehicle.vehiculoId);
+      
+      if (result.success) {
+        console.log('✅ Trabajos cargados:', result.data);
+        setTrabajos(result.data);
+      } else {
+        console.log('❌ Error cargando trabajos:', result.error);
+        setError(result.error);
+      }
+      setLoading(false);
+    };
 
-  const handleDownloadPDF = (work) => {
-    // Crear contenido del PDF como string
+    loadWorkHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleDownloadPDF = (trabajo) => {
+    // Calcular totales desde resumenFinanciero
+    const totalServicios = trabajo.servicios?.reduce((sum, s) => sum + s.monto, 0) || 0;
+    const totalRefacciones = trabajo.refacciones?.reduce((sum, r) => sum + (r.cantidad * r.costoUnitario), 0) || 0;
+    const totalManoObra = trabajo.manoDeObra?.reduce((sum, m) => sum + m.precio, 0) || 0;
+    const totalPresupuesto = totalServicios + totalRefacciones + totalManoObra;
+
+    // Crear contenido del archivo
     const content = `
-HISTORIAL DE TRABAJO - ${getVehicleDisplayName(vehicle)}
+HISTORIAL DE TRABAJO - ${vehicle.marca} ${vehicle.modelo}
 
-Vehículo: ${getVehicleDisplayName(vehicle)}
-Placa: ${vehicle.plates}
-Tipo: ${getVehicleType(vehicle.vehicleType)}
-Fecha de trabajo: ${new Date(work.date).toLocaleDateString('es-CO')}
+Vehículo: ${vehicle.marca} ${vehicle.modelo}
+Placa: ${vehicle.placas}
+Tipo: ${vehicle.tipo.toUpperCase()}
+Fecha de trabajo: ${new Date(trabajo.createdAt).toLocaleDateString('es-CO')}
 
 --- SERVICIOS ---
-${work.services.map(s => `${s.description}: $${s.amount.toLocaleString()}`).join('\n')}
+${trabajo.servicios?.map(s => `${s.descripcion}: $${s.monto.toLocaleString()}`).join('\n') || 'Sin servicios'}
 
 --- REPUESTOS ---
-${work.parts.length > 0 ? work.parts.map(p => `${p.name} (Qty: ${p.quantity}): $${(p.quantity * p.cost).toLocaleString()}`).join('\n') : 'Sin repuestos'}
+${trabajo.refacciones?.length > 0 ? trabajo.refacciones.map(r => `${r.nombre} (Qty: ${r.cantidad}): $${(r.cantidad * r.costoUnitario).toLocaleString()}`).join('\n') : 'Sin repuestos'}
 
 --- MANO DE OBRA ---
-${work.labor.map(l => `${l.description}: $${l.price.toLocaleString()}`).join('\n')}
+${trabajo.manoDeObra?.map(m => `${m.descripcion}: $${m.precio.toLocaleString()}`).join('\n') || 'Sin mano de obra'}
 
 --- TOTAL ---
-Total: $${calculateWorkTotal(work).toLocaleString()}
+Total Servicios: $${totalServicios.toLocaleString()}
+Total Refacciones: $${totalRefacciones.toLocaleString()}
+Total Mano de Obra: $${totalManoObra.toLocaleString()}
+TOTAL PRESUPUESTO: $${totalPresupuesto.toLocaleString()}
 
-Notas: ${work.notes}
+Observaciones Técnicas: ${trabajo.observacionesTecnicas || 'Sin observaciones'}
+Estatus: ${trabajo.estatus}
     `;
 
     // Crear blob y descargar
@@ -57,12 +83,25 @@ Notas: ${work.notes}
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Historial_${vehicle.plates}_${new Date(work.date).toISOString().split('T')[0]}.txt`;
+    a.download = `Historial_${vehicle.placas}_${new Date(trabajo.createdAt).toISOString().split('T')[0]}.txt`;
     document.body.appendChild(a);
     a.click();
     window.URL.revokeObjectURL(url);
     document.body.removeChild(a);
   };
+
+  if (!vehicle) {
+    return (
+      <div className="history-container">
+        <div className="empty-state">
+          <p>❌ Vehículo no encontrado</p>
+          <button className="btn btn-primary" onClick={() => navigate('/vehicles')}>
+            Volver a Vehículos
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="history-container">
@@ -82,21 +121,33 @@ Notas: ${work.notes}
         <section className="vehicle-summary-section-history">
           <div className="vehicle-summary-history">
             <div className="summary-item-history">
-              <h3>{getVehicleDisplayName(vehicle)}</h3>
-              <p><strong>Placa:</strong> {vehicle.plates}</p>
-              <p><strong>Cliente:</strong> {vehicle.clientName}</p>
-              <p><strong>Contacto:</strong> {vehicle.clientPhone}</p>
+              <h3>{vehicle.marca} {vehicle.modelo}</h3>
+              <p><strong>Placa:</strong> {vehicle.placas}</p>
+              <p><strong>Tipo:</strong> {vehicle.tipo.toUpperCase()}</p>
+              <p><strong>Color:</strong> {vehicle.color}</p>
+              <p><strong>Kilometraje:</strong> {vehicle.kilometraje} km</p>
             </div>
           </div>
         </section>
 
         {/* Historial de Trabajos */}
-        {workHistory.length === 0 ? (
+        {loading ? (
+          <div className="empty-state">
+            <p>Cargando historial de trabajos...</p>
+          </div>
+        ) : error ? (
+          <div className="empty-state">
+            <p>❌ Error: {error}</p>
+            <button className="btn btn-primary" onClick={() => navigate('/vehicles')}>
+              Volver a Vehículos
+            </button>
+          </div>
+        ) : trabajos.length === 0 ? (
           <div className="empty-state">
             <p>No hay trabajos registrados para este vehículo</p>
             <button 
               className="btn btn-primary" 
-              onClick={() => navigate(`/register-work/${vehicleId}`, { state: { vehicle } })}
+              onClick={() => navigate('/register-work', { state: { vehicle } })}
             >
               Registrar Primer Trabajo
             </button>
@@ -105,93 +156,100 @@ Notas: ${work.notes}
           <section className="work-history-section">
             <h2>Trabajos Realizados</h2>
             <div className="work-list">
-              {workHistory.map((work) => (
-                <div key={work.id} className="work-item">
-                  <div className="work-header">
-                    <h4>{new Date(work.date).toLocaleDateString('es-CO')}</h4>
-                    <span className={`status-badge status-${work.status}`}>
-                      {work.status.charAt(0).toUpperCase() + work.status.slice(1)}
-                    </span>
-                  </div>
+              {trabajos.map((trabajo) => {
+                const totalServicios = trabajo.servicios?.reduce((sum, s) => sum + s.monto, 0) || 0;
+                const totalRefacciones = trabajo.refacciones?.reduce((sum, r) => sum + (r.cantidad * r.costoUnitario), 0) || 0;
+                const totalManoObra = trabajo.manoDeObra?.reduce((sum, m) => sum + m.precio, 0) || 0;
+                const totalPresupuesto = totalServicios + totalRefacciones + totalManoObra;
 
-                  <div className="work-details">
-                    {/* Servicios */}
-                    <div className="detail-section">
-                      <h5>Servicios</h5>
-                      {work.services.length > 0 ? (
-                        <ul>
-                          {work.services.map((service, idx) => (
-                            <li key={idx}>
-                              <span>{service.description}</span>
-                              <span>${service.amount.toLocaleString()}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="no-data">Sin servicios</p>
-                      )}
+                return (
+                  <div key={trabajo._id} className="work-item">
+                    <div className="work-header">
+                      <h4>{new Date(trabajo.createdAt).toLocaleDateString('es-CO')}</h4>
+                      <span className={`status-badge status-${trabajo.estatus}`}>
+                        {trabajo.estatus.charAt(0).toUpperCase() + trabajo.estatus.slice(1)}
+                      </span>
                     </div>
 
-                    {/* Repuestos */}
-                    <div className="detail-section">
-                      <h5>Repuestos/Materiales</h5>
-                      {work.parts.length > 0 ? (
-                        <ul>
-                          {work.parts.map((part, idx) => (
-                            <li key={idx}>
-                              <span>{part.name} (Qty: {part.quantity})</span>
-                              <span>${(part.quantity * part.cost).toLocaleString()}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="no-data">Sin repuestos</p>
-                      )}
-                    </div>
-
-                    {/* Mano de obra */}
-                    <div className="detail-section">
-                      <h5>Mano de Obra</h5>
-                      {work.labor.length > 0 ? (
-                        <ul>
-                          {work.labor.map((labor, idx) => (
-                            <li key={idx}>
-                              <span>{labor.description}</span>
-                              <span>${labor.price.toLocaleString()}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p className="no-data">Sin mano de obra</p>
-                      )}
-                    </div>
-
-                    {/* Total */}
-                    <div className="work-total">
-                      <h5>Total:</h5>
-                      <p className="total-amount">${calculateWorkTotal(work).toLocaleString()}</p>
-                    </div>
-
-                    {/* Notas */}
-                    {work.notes && (
-                      <div className="notes-section">
-                        <h5>Notas:</h5>
-                        <p>{work.notes}</p>
+                    <div className="work-details">
+                      {/* Servicios */}
+                      <div className="detail-section">
+                        <h5>Servicios</h5>
+                        {trabajo.servicios?.length > 0 ? (
+                          <ul>
+                            {trabajo.servicios.map((servicio, idx) => (
+                              <li key={idx}>
+                                <span>{servicio.descripcion}</span>
+                                <span>${servicio.monto.toLocaleString()}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="no-data">Sin servicios</p>
+                        )}
                       </div>
-                    )}
-                  </div>
 
-                  {/* Botón Descargar PDF */}
-                  <div className="work-actions">
-                    <button 
-                      className="btn btn-download"
-                      onClick={() => handleDownloadPDF(work)}
-                    >
-                      📥 Descargar PDF
-                    </button>
+                      {/* Refacciones */}
+                      <div className="detail-section">
+                        <h5>Refacciones/Materiales</h5>
+                        {trabajo.refacciones?.length > 0 ? (
+                          <ul>
+                            {trabajo.refacciones.map((refaccion, idx) => (
+                              <li key={idx}>
+                                <span>{refaccion.nombre} (Qty: {refaccion.cantidad})</span>
+                                <span>${(refaccion.cantidad * refaccion.costoUnitario).toLocaleString()}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="no-data">Sin refacciones</p>
+                        )}
+                      </div>
+
+                      {/* Mano de Obra */}
+                      <div className="detail-section">
+                        <h5>Mano de Obra</h5>
+                        {trabajo.manoDeObra?.length > 0 ? (
+                          <ul>
+                            {trabajo.manoDeObra.map((mano, idx) => (
+                              <li key={idx}>
+                                <span>{mano.descripcion}</span>
+                                <span>${mano.precio.toLocaleString()}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="no-data">Sin mano de obra</p>
+                        )}
+                      </div>
+
+                      {/* Total */}
+                      <div className="work-total">
+                        <h5>Total Presupuesto:</h5>
+                        <p className="total-amount">${totalPresupuesto.toLocaleString()}</p>
+                      </div>
+
+                      {/* Observaciones Técnicas */}
+                      {trabajo.observacionesTecnicas && (
+                        <div className="notes-section">
+                          <h5>Observaciones Técnicas:</h5>
+                          <p>{trabajo.observacionesTecnicas}</p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Botón Descargar PDF */}
+                    <div className="work-actions">
+                      <button 
+                        className="btn btn-download"
+                        onClick={() => handleDownloadPDF(trabajo)}
+                      >
+                        📥 Descargar Reporte
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
