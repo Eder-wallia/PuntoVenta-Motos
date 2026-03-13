@@ -49,12 +49,6 @@ export function RegisterWork() {
         const result = await getAllVehicles();
         if (result.success) {
           setVehicles(result.data);
-          
-          // Si viene un vehículo en el state desde VehiclesList, usarlo directamente
-          if (location.state?.vehicle) {
-            console.log('🚗 Vehículo pre-seleccionado desde VehiclesList:', location.state.vehicle);
-            setSelectedVehicle(location.state.vehicle);
-          }
         } else {
           setVehicleError(result.error);
         }
@@ -67,6 +61,34 @@ export function RegisterWork() {
     };
     loadVehicles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Sincronizar vehículo del state cuando llega o desde sessionStorage
+  useEffect(() => {
+    console.log('📱 RegisterWork montado - location.state:', location.state);
+    console.log('📦 sessionStorage.currentVehicle:', sessionStorage.getItem('currentVehicle'));
+    
+    if (location.state?.vehicle) {
+      console.log('✅ Vehículo pre-seleccionado desde state:', location.state.vehicle);
+      setSelectedVehicle(location.state.vehicle);
+      sessionStorage.setItem('currentVehicle', JSON.stringify(location.state.vehicle));
+    } else {
+      // Intentar recuperar del sessionStorage
+      const storedVehicle = sessionStorage.getItem('currentVehicle');
+      console.log('🔍 Buscando vehículo en sessionStorage...');
+      
+      if (storedVehicle) {
+        try {
+          const vehicle = JSON.parse(storedVehicle);
+          console.log('✅ Vehículo recuperado desde sessionStorage:', vehicle);
+          setSelectedVehicle(vehicle);
+        } catch (err) {
+          console.error('❌ Error al recuperar vehículo de sessionStorage:', err);
+        }
+      } else {
+        console.log('⚠️ No hay vehículo en sessionStorage');
+      }
+    }
   }, []);
 
   const handleSelectVehicle = (vehicleId) => {

@@ -372,20 +372,31 @@
   .history-header {
     padding: 12px;
     gap: 8px;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
   }
 
   .history-header h1 {
-    font-size: 18px;
-    line-height: 1.2;
+    font-size: 16px;
+    line-height: 1;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    white-space: nowrap;
   }
 
   .btn-back {
     padding: 6px 12px;
     font-size: 14px;
     border-radius: 6px;
-    align-self: flex-start; /* que no se estire verticalmente */
-    width: fit-content; /* que no ocupe todo el ancho */
-    
+    align-self: flex-start;
+    width: fit-content;
+    order: -1;
+    position: relative;
+    z-index: 1;
   }
 
   .history-main {

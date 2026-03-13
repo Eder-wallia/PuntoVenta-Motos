@@ -9,7 +9,7 @@ export function VehiclesHistory() {
   const [trabajos, setTrabajos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { getWorkHistory } = useHistoryVehicle();
+  const { getWorkHistory, downloadWorkPDF } = useHistoryVehicle();
 
   // Obtener vehículo del state de navegación
   const vehicle = location.state?.vehicle;
@@ -41,53 +41,13 @@ export function VehiclesHistory() {
 
     loadWorkHistory();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [vehicle]);
 
-  const handleDownloadPDF = (trabajo) => {
-    // Calcular totales desde resumenFinanciero
-    const totalServicios = trabajo.servicios?.reduce((sum, s) => sum + s.monto, 0) || 0;
-    const totalRefacciones = trabajo.refacciones?.reduce((sum, r) => sum + (r.cantidad * r.costoUnitario), 0) || 0;
-    const totalManoObra = trabajo.manoDeObra?.reduce((sum, m) => sum + m.precio, 0) || 0;
-    const totalPresupuesto = totalServicios + totalRefacciones + totalManoObra;
-
-    // Crear contenido del archivo
-    const content = `
-HISTORIAL DE TRABAJO - ${vehicle.marca} ${vehicle.modelo}
-
-Vehículo: ${vehicle.marca} ${vehicle.modelo}
-Placa: ${vehicle.placas}
-Tipo: ${vehicle.tipo.toUpperCase()}
-Fecha de trabajo: ${new Date(trabajo.createdAt).toLocaleDateString('es-CO')}
-
---- SERVICIOS ---
-${trabajo.servicios?.map(s => `${s.descripcion}: $${s.monto.toLocaleString()}`).join('\n') || 'Sin servicios'}
-
---- REPUESTOS ---
-${trabajo.refacciones?.length > 0 ? trabajo.refacciones.map(r => `${r.nombre} (Qty: ${r.cantidad}): $${(r.cantidad * r.costoUnitario).toLocaleString()}`).join('\n') : 'Sin repuestos'}
-
---- MANO DE OBRA ---
-${trabajo.manoDeObra?.map(m => `${m.descripcion}: $${m.precio.toLocaleString()}`).join('\n') || 'Sin mano de obra'}
-
---- TOTAL ---
-Total Servicios: $${totalServicios.toLocaleString()}
-Total Refacciones: $${totalRefacciones.toLocaleString()}
-Total Mano de Obra: $${totalManoObra.toLocaleString()}
-TOTAL PRESUPUESTO: $${totalPresupuesto.toLocaleString()}
-
-Observaciones Técnicas: ${trabajo.observacionesTecnicas || 'Sin observaciones'}
-Estatus: ${trabajo.estatus}
-    `;
-
-    // Crear blob y descargar
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `Historial_${vehicle.placas}_${new Date(trabajo.createdAt).toISOString().split('T')[0]}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+  const handleDownloadPDF = async (trabajo) => {
+    const result = await downloadWorkPDF(trabajo._id, vehicle);
+    if (!result.success) {
+      alert('Error al descargar el PDF. Intenta nuevamente.');
+    }
   };
 
   if (!vehicle) {
@@ -145,12 +105,6 @@ Estatus: ${trabajo.estatus}
         ) : trabajos.length === 0 ? (
           <div className="empty-state">
             <p>No hay trabajos registrados para este vehículo</p>
-            <button 
-              className="btn btn-primary" 
-              onClick={() => navigate('/register-work', { state: { vehicle } })}
-            >
-              Registrar Primer Trabajo
-            </button>
           </div>
         ) : (
           <section className="work-history-section">

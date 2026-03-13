@@ -59,8 +59,40 @@ export const useHistoryVehicle = () => {
     }
   };
 
+  const downloadWorkPDF = async (trabajoId, vehicle) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/api/trabajos/${trabajoId}/pdf`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          responseType: 'blob'
+        }
+      );
+
+      // Crear blob y descargar
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `Reporte_${vehicle.placas}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+      return { success: true };
+    } catch (err) {
+      console.error('❌ Error descargando PDF:', err);
+      const errorMessage = err.response?.data?.message || err.message || 'Error al descargar el PDF';
+      return { success: false, error: errorMessage };
+    }
+  };
+
   return {
     getWorkHistory,
+    downloadWorkPDF,
     isLoading,
     error,
   };
