@@ -27,7 +27,7 @@ export const useRegisterVehicle = () => {
       console.log('Enviando datos del vehículo:', payload);
       console.log('Token:', token ? 'Presente' : 'Ausente');
 
-      const response = await axios.post('http://localhost:3000/api/vehiculos', payload, {
+      const response = await axios.post('https://puntoventa-back.onrender.com/api/vehiculos', payload, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export const useRegisterVehicle = () => {
       console.log('Obteniendo todos los vehículos...');
       console.log('Token:', token ? 'Presente' : 'Ausente');
 
-      const response = await axios.get('http://localhost:3000/api/vehiculos', {
+      const response = await axios.get('https://puntoventa-back.onrender.com/api/vehiculos', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

@@ -150,7 +150,7 @@ export function VehiclesHistory() {
                           <ul>
                             {trabajo.refacciones.map((refaccion, idx) => (
                               <li key={idx}>
-                                <span>{refaccion.nombre} (Qty: {refaccion.cantidad})</span>
+                                <span>{refaccion.nombre} (Cant: {refaccion.cantidad})</span>
                                 <span>${(refaccion.cantidad * refaccion.costoUnitario).toLocaleString()}</span>
                               </li>
                             ))}

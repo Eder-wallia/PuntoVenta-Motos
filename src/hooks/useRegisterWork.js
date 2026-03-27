@@ -153,7 +153,7 @@ export function useRegisterWork(vehicle) {
       console.log('Token:', token ? 'Presente' : 'Ausente');
 
       const response = await axios.post(
-        'http://localhost:3000/api/trabajos',
+        'https://puntoventa-back.onrender.com/api/trabajos',
         payload,
         {
           headers: {

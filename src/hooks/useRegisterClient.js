@@ -23,7 +23,7 @@ export const useRegisterClient = () => {
       console.log('Enviando datos del cliente:', payload);
       console.log('Token:', token ? 'Presente' : 'Ausente');
 
-      const response = await axios.post('http://localhost:3000/api/clientes', payload, {
+      const response = await axios.post('https://puntoventa-back.onrender.com/api/clientes', payload, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export const useRegisterClient = () => {
       console.log('Obteniendo todos los clientes...');
       console.log('Token:', token ? 'Presente' : 'Ausente');
 
-      const response = await axios.get('http://localhost:3000/api/clientes', {
+      const response = await axios.get('https://puntoventa-back.onrender.com/api/clientes', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',

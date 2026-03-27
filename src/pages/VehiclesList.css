@@ -300,11 +300,7 @@
 }
 
 .btn-primary {
-  background: linear-gradient(
-    135deg,
-    var(--color-accent) 0%,
-    var(--color-primary) 100%
-  );
+  background: red;
   color: white;
 }
 

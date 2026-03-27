@@ -21,7 +21,7 @@ export const useHistoryVehicle = () => {
       console.log('Token:', token ? 'Presente' : 'Ausente');
 
       const response = await axios.get(
-        `http://localhost:3000/api/trabajos/vehiculo/${vehiculoId}`,
+        `https://puntoventa-back.onrender.com/api/trabajos/vehiculo/${vehiculoId}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -62,7 +62,7 @@ export const useHistoryVehicle = () => {
   const downloadWorkPDF = async (trabajoId, vehicle) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/trabajos/${trabajoId}/pdf`,
+        `https://puntoventa-back.onrender.com/api/trabajos/${trabajoId}/pdf`,
         {
           headers: {
             'Authorization': `Bearer ${token}`,
