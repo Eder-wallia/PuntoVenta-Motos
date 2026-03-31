@@ -13,6 +13,7 @@ export function RegisterMoto() {
     handleChange,
     handleSubmit,
     handleCancel,
+    handleCloseSuccess,
   } = useRegisterMoto();
 
   return (
@@ -58,9 +59,9 @@ export function RegisterMoto() {
                 <button 
                   type="button"
                   className="btn btn-primary"
-                  disabled={true}
+                  onClick={handleCloseSuccess}
                 >
-                  Redirigiendo...
+                  Ir al Dashboard
                 </button>
               </div>
             </div>

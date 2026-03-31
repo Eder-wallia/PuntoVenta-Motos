@@ -447,14 +447,14 @@
 .modal-header {
   background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
   color: white;
-  padding: 20px;
-  border-bottom: 1px solid #eee;
+  padding: 24px 20px;
+  border-bottom: none;
 }
 
 .modal-header h2 {
   margin: 0;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .modal-success .modal-header {
@@ -462,21 +462,27 @@
 }
 
 .modal-body {
-  padding: 20px;
+  padding: 24px 20px;
   font-size: 16px;
   color: #333;
-  line-height: 1.5;
+  line-height: 1.6;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-footer {
-  padding: 15px 20px;
-  background-color: #f8f9fa;
+  padding: 16px 20px;
+  background-color: #fafafa;
   display: flex;
   gap: 10px;
   justify-content: flex-end;
-  border-top: 1px solid #eee;
+  border-top: none;
 }
 
 .modal-footer .btn {
   margin: 0;
+  padding: 10px 24px;
+  min-width: 150px;
 }

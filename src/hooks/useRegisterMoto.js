@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRegisterClient } from './useRegisterClient';
 import { useRegisterVehicle } from './useRegisterVehicle';
+import { useVehicleStore } from '../store/vehicleStore';
 
 export function useRegisterMoto() {
   const navigate = useNavigate();
@@ -10,34 +11,24 @@ export function useRegisterMoto() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [vehicleType, setVehicleType] = useState(''); // 'motorcycle' o 'car'
-
-  const [formData, setFormData] = useState({
-    // Datos cliente
-    clientName: '',
-    clientPhone: '',
-    clientEmail: '',
-    clientAddress: '',
-    
-    // Datos vehiculo
-    motorcycleBrand: '',
-    carBrand: '',
-    model: '',
-    color: '',
-    plates: '',
-    mileage: '',
-    observations: '',
-  });
+  
+  // Usar el store persistente para los datos del formulario
+  const vehicleType = useVehicleStore((state) => state.vehicleType);
+  const formData = useVehicleStore((state) => state.formData);
+  const setVehicleType = useVehicleStore((state) => state.setVehicleType);
+  const updateFormField = useVehicleStore((state) => state.updateFormField);
+  const setFormData = useVehicleStore((state) => state.setFormData);
+  const clearForm = useVehicleStore((state) => state.clearForm);
 
   const handleVehicleTypeChange = (type) => {
     setVehicleType(type);
     setError('');
     // Limpiar los campos de marca al cambiar de tipo
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
+      ...formData,
       motorcycleBrand: '',
       carBrand: '',
-    }));
+    });
   };
 
   const handleChange = (e) => {
@@ -46,15 +37,9 @@ export function useRegisterMoto() {
     // Si es el campo de teléfono, solo permitir números
     if (name === 'clientPhone') {
       const onlyNumbers = value.replace(/\D/g, '');
-      setFormData((prev) => ({
-        ...prev,
-        [name]: onlyNumbers,
-      }));
+      updateFormField(name, onlyNumbers);
     } else {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      updateFormField(name, value);
     }
     setError('');
   };
@@ -189,25 +174,7 @@ export function useRegisterMoto() {
       console.log('Vehículo registrado exitosamente:', vehicleResult.data);
       
       setSuccess('¡Vehículo y cliente registrados correctamente!');
-      setFormData({
-        clientName: '',
-        clientPhone: '',
-        clientEmail: '',
-        clientAddress: '',
-        motorcycleBrand: '',
-        carBrand: '',
-        model: '',
-        color: '',
-        plates: '',
-        mileage: '',
-        observations: '',
-      });
-      setVehicleType('');
-      
-      // Redirigir al dashboard después de 2 segundos
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 2000);
+      clearForm();
     } catch (err) {
       setError('Error al registrar el vehículo');
       console.error(err);
@@ -217,6 +184,12 @@ export function useRegisterMoto() {
   };
 
   const handleCancel = () => {
+    clearForm();
+    navigate('/dashboard');
+  };
+
+  const handleCloseSuccess = () => {
+    clearForm();
     navigate('/dashboard');
   };
 
@@ -232,5 +205,6 @@ export function useRegisterMoto() {
     handleChange,
     handleSubmit,
     handleCancel,
+    handleCloseSuccess,
   };
 }

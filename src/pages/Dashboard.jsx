@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import faviconIcon from '../assets/logo-mc.svg';
 import './Dashboard.css';
 
 export function Dashboard() {
@@ -22,7 +23,10 @@ export function Dashboard() {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>Sistema de Gestión de Vehiculos</h1>
+          <div className="header-title">
+            <img src={faviconIcon} alt="Logo" className="header-icon" />
+            <h1>Sistema de Gestión de Vehiculos</h1>
+          </div>
           <div className="user-info">
             <span>Bienvenido, <strong>{user?.name ? user.name.charAt(0).toUpperCase() + user.name.slice(1) : user?.email}</strong></span>
             <button onClick={handleLogout} className="btn btn-logout">
